@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 import '../components/rounded_button.dart';
 import '../constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'chat_screen.dart';
 
 class LoginScreen extends StatefulWidget {
+  final _auth = FirebaseAuth.instance;
   static const String id = 'login_screen';
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _auth = FirebaseAuth.instance;
+
+  String email;
+  String password;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,8 +37,11 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 48.0,
             ),
             TextField(
+              keyboardType: TextInputType.emailAddress,
+              textAlign: TextAlign.center,
               onChanged: (value) {
                 //Do something with the user input.
+                email = value;
               },
               decoration:
                   kTextFieldDecoration.copyWith(hintText: 'Enter Your Email'),
@@ -40,8 +50,11 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 8.0,
             ),
             TextField(
+              obscureText: true,
+              textAlign: TextAlign.center,
               onChanged: (value) {
                 //Do something with the user input.
+                password = value;
               },
               decoration: kTextFieldDecoration.copyWith(
                   hintText: 'Enter Your Password'),
@@ -52,7 +65,19 @@ class _LoginScreenState extends State<LoginScreen> {
             RoundedButton(
               title: 'Log In',
               colour: Colors.lightBlueAccent,
-              onPressed: () {},
+              onPressed: () async {
+                try {
+                  final validateuser = await _auth.signInWithEmailAndPassword(
+                      email: email, password: password);
+                  if (validateuser != null) {
+                    Navigator.popAndPushNamed(context, ChatScreen.id);
+                  } else {
+                    print('Invalid User');
+                  }
+                } catch (e) {
+                  print(e);
+                }
+              },
             ),
           ],
         ),
